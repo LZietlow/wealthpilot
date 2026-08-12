@@ -29,7 +29,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
         } catch (error) {
             console.error(error);
             const message = error instanceof Error ? error.message : 'unknown error';
-            res.status(401).json({error: message});
+            res.status(409).json({status: 'error', message});
         }
     } else {
         res.status(401).json({message: "Invalid Token"})
