@@ -21,4 +21,24 @@ router.get('/', authenticateToken, async(req, res) => {
     }
 })
 
+router.post('/', authenticateToken, async(req, res) => {
+    var name = req.body.name;
+    var userId = (req as any).userId;
+
+    var balance = 0;
+    if(req.body.balance != undefined) {
+        balance = req.body.balance;
+    }
+    var account
+    try {
+         account = await pool.query('INSERT INTO accounts (user_id, name, balance) VALUES ($1, $2, $3) RETURNING *', [userId, name, balance]);
+         res.status(201).json({message: 'account created succesfully', account: account.rows[0]});
+    } catch (error) {
+        res.status(400).json({message: 'Could not create new account'})
+        console.log(error)
+    }
+    
+
+})
+
 export default router;
