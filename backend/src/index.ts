@@ -5,6 +5,7 @@ import { pool } from './config/db';
 import authRoute from './routes/authRoute'
 import accountRoute from './routes/accountRoutes'
 import transactionRoute from './routes/transactionRoutes'
+import categoryRoute from './routes/categoryRoutes'
 
 dotenv.config();
 
@@ -22,7 +23,8 @@ app.use((req, res, next) => {
 
 app.use('/auth', authRoute);
 app.use('/accounts', accountRoute);
-app.use('/transactions', transactionRoute)
+app.use('/transactions', transactionRoute);
+app.use('/categories', categoryRoute);
 
 // Erste Test-Route: zeigt, dass der Server läuft
 app.get('/health', async (req, res) => {

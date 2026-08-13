@@ -14,6 +14,8 @@ export default function Dashboard() {
     const[transAccountId, setTransAccountId] = useState('');
     const[transAmount, setTransAmount] = useState('');
     const[transDescription, setTransDescription] = useState('');
+    const[categories, setCategories] = useState([]);
+    const[transCategoryId, setTransCategoryId] =useState('');
     const navigate = useNavigate();
 
 
@@ -22,6 +24,11 @@ export default function Dashboard() {
         const response = await axios.get('http://localhost:3000/transactions', { headers: { Authorization: `Bearer ${token}`}});
         setTransactions(response.data.transactions || []);
         
+    }
+
+    async function fetchCategories() {
+        const response = await axios.get('http://localhost:3000/categories');
+        setCategories(response.data.categories)
     }
 
 
@@ -34,6 +41,7 @@ export default function Dashboard() {
     useEffect(() => {
         fetchAccounts();
         fetchTransactions();
+        fetchCategories();
     }, []);
 
     async function handleCreateAccount(e: React.FormEvent<HTMLFormElement>) {
@@ -56,9 +64,10 @@ export default function Dashboard() {
         try {
             const token = localStorage.getItem('token');
             const amount_float = parseFloat(transAmount);
-            await axios.post('http://localhost:3000/transactions', {account_id: transAccountId, amount: amount_float, description: transDescription},  {headers: {Authorization: `Bearer ${token}`}})
+            await axios.post('http://localhost:3000/transactions', {account_id: transAccountId, amount: amount_float, description: transDescription, category_id: transCategoryId},  {headers: {Authorization: `Bearer ${token}`}})
             fetchTransactions();
             setTransAccountId('');
+            setTransCategoryId('');
             setTransAmount('');
             setTransDescription('');
         } catch (error) {
@@ -95,6 +104,12 @@ export default function Dashboard() {
             <input name="account_id" value={transAccountId} onChange={(e) => setTransAccountId(e.target.value)}></input>
             <input name="amount" value={transAmount} onChange={(e) => setTransAmount(e.target.value)}></input>
             <input name="description" value={transDescription} onChange={(e) => setTransDescription(e.target.value)}></input>
+            <select value={transCategoryId} onChange={(e) => setTransCategoryId(e.target.value)}>
+                <option value={""}>-- Kategorie wählen --</option>
+                {categories.map(category => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
+                ))}
+            </select>
             <button type="submit">Do Transaction</button>
         </form>
 
