@@ -116,7 +116,7 @@ export default function Dashboard() {
         <ul>
             {transactions.map(transaction => (
                 <li key={transaction.id}>
-                    {transaction.id}
+                    {transaction.id} {transaction.category_name}
                 </li>
             ))}
         </ul>

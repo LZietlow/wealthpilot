@@ -12,12 +12,13 @@ router.get('/', authenticateToken, async(req, res) => {
     console.log("test" + user_id);
     
     try {
-        const response = await pool.query('SELECT transactions.* FROM transactions JOIN accounts ON transactions.account_id = accounts.id WHERE accounts.user_id = $1', [user_id]);
+        const response = await pool.query('SELECT transactions.*, categories.name AS category_name FROM transactions JOIN accounts ON transactions.account_id = accounts.id LEFT JOIN categories ON transactions.category_id = categories.id WHERE accounts.user_id = $1', [user_id]);
         res.json({transactions: response.rows})
 
     } catch (error) {
         res.status(401).json({message: "UserId undefined"})
     }
+    
 })
 
 router.post('/', authenticateToken, async(req, res) => {
