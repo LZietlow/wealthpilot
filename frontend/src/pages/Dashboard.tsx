@@ -9,6 +9,19 @@ export default function Dashboard() {
     const[name, setName] = useState('');
     const[balance, setBalance] = useState('');
     const[error, setErrorMessage] = useState('');
+    const[transactions, setTransactions] = useState([]);
+    const[transAccountId, setTransAccountId] = useState('');
+    const[transAmount, setTransAmount] = useState('');
+    const[transDescription, setTransDescription] = useState('');
+
+
+    async function fetchTransactions() {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:3000/transactions', { headers: { Authorization: `Bearer ${token}`}});
+        setTransactions(response.data.transactions || []);
+        
+    }
+
 
     async function fetchAccounts() {
             const token = localStorage.getItem('token');
@@ -18,6 +31,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchAccounts();
+        fetchTransactions();
     }, []);
 
     async function handleCreateAccount(e: React.FormEvent<HTMLFormElement>) {
@@ -35,6 +49,23 @@ export default function Dashboard() {
         }
     }
 
+    async function handleCreateTransaction(e:React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('token');
+            const amount_float = parseFloat(transAmount);
+            await axios.post('http://localhost:3000/transactions', {account_id: transAccountId, amount: amount_float, description: transDescription},  {headers: {Authorization: `Bearer ${token}`}})
+            fetchTransactions();
+            setTransAccountId('');
+            setTransAmount('');
+            setTransDescription('');
+        } catch (error) {
+            setErrorMessage('Could not make transaction')
+            console.log(error);
+        }
+        
+    }
+
     return(
         <div>
         <form onSubmit={handleCreateAccount}>
@@ -47,10 +78,26 @@ export default function Dashboard() {
         <ul>
             {accounts.map(account => (
                 <li key={account.id}>
-                    {account.id}
+                    {account.id} {account.name} {account.balance}
                 </li>
             ))}
         </ul>
+
+        <form onSubmit={handleCreateTransaction}>
+            <input name="account_id" value={transAccountId} onChange={(e) => setTransAccountId(e.target.value)}></input>
+            <input name="amount" value={transAmount} onChange={(e) => setTransAmount(e.target.value)}></input>
+            <input name="description" value={transDescription} onChange={(e) => setTransDescription(e.target.value)}></input>
+            <button type="submit">Do Transaction</button>
+        </form>
+
+        <ul>
+            {transactions.map(transaction => (
+                <li key={transaction.id}>
+                    {transaction.id}
+                </li>
+            ))}
+        </ul>
+
         </div>
     )
 

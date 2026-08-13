@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { pool } from './config/db';
 import authRoute from './routes/authRoute'
 import accountRoute from './routes/accountRoutes'
+import transactionRoute from './routes/transactionRoutes'
 
 dotenv.config();
 
@@ -12,8 +13,16 @@ const app = express();
 // Middleware: läuft bei JEDEM Request, bevor er die Route erreicht
 app.use(cors());
 app.use(express.json()); // erlaubt es, JSON-Request-Bodies zu lesen (req.body)
+
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`, req.body);
+    next();
+})
+
+
 app.use('/auth', authRoute);
 app.use('/accounts', accountRoute);
+app.use('/transactions', transactionRoute)
 
 // Erste Test-Route: zeigt, dass der Server läuft
 app.get('/health', async (req, res) => {
