@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -13,6 +14,7 @@ export default function Dashboard() {
     const[transAccountId, setTransAccountId] = useState('');
     const[transAmount, setTransAmount] = useState('');
     const[transDescription, setTransDescription] = useState('');
+    const navigate = useNavigate();
 
 
     async function fetchTransactions() {
@@ -66,6 +68,12 @@ export default function Dashboard() {
         
     }
 
+    async function handleLogout() {
+        localStorage.removeItem('token');
+        navigate('/login');
+
+    }
+
     return(
         <div>
         <form onSubmit={handleCreateAccount}>
@@ -97,6 +105,8 @@ export default function Dashboard() {
                 </li>
             ))}
         </ul>
+
+        <button type="button" onClick={handleLogout}>Logout</button>
 
         </div>
     )
