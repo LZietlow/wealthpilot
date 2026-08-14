@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
 
 
@@ -83,6 +84,28 @@ export default function Dashboard() {
 
     }
 
+    function aggregateByCategory(transactions) {
+        const totals = {};
+        console.log(transactions);
+        transactions.forEach(transaction => {
+            const category = transaction.category_name || 'No category';
+            if(!(category in totals)) {
+                totals[category] = 0;
+            }
+            totals[category] += parseFloat(transaction.amount);
+        });
+
+        console.log(totals);
+
+        const arr = Object.entries(totals).map(([category, total]) => {
+            return {category, total};
+        });
+        console.log(arr);
+        return arr;
+    }
+
+    const totalByCategory = aggregateByCategory(transactions);
+
     return(
         <div>
         <form onSubmit={handleCreateAccount}>
@@ -122,6 +145,16 @@ export default function Dashboard() {
         </ul>
 
         <button type="button" onClick={handleLogout}>Logout</button>
+
+        <BarChart width={600} height={300} data={totalByCategory}>
+            <XAxis dataKey='category'></XAxis>
+            <YAxis></YAxis>
+            <Tooltip></Tooltip>
+            <Bar dataKey='total' fill="#8884d8"></Bar>
+        </BarChart>
+        
+
+
 
         </div>
     )

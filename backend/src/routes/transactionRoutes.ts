@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get('/', authenticateToken, async(req, res) => {
     var user_id = (req as any).userId;
-    console.log("test" + user_id);
+    //console.log("test" + user_id);
     
     try {
         const response = await pool.query('SELECT transactions.*, categories.name AS category_name FROM transactions JOIN accounts ON transactions.account_id = accounts.id LEFT JOIN categories ON transactions.category_id = categories.id WHERE accounts.user_id = $1', [user_id]);

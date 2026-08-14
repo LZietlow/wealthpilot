@@ -46,10 +46,10 @@ router.post('/login', async (req, res) => {
         if (!process.env.JWT_SECRET) {
             throw new Error('JWT_SECRET not defined');
         }
-        console.log('Payload vor jwt.sign:', { userId: user.id });
+        //console.log('Payload vor jwt.sign:', { userId: user.id });
         var token = jwt.sign({userId: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'})
-        console.log('JWT_SECRET beim Login:', process.env.JWT_SECRET);
-        console.log('Secret (Login):', JSON.stringify(process.env.JWT_SECRET));
+        //console.log('JWT_SECRET beim Login:', process.env.JWT_SECRET);
+        //console.log('Secret (Login):', JSON.stringify(process.env.JWT_SECRET));
         res.status(200).json({token: token})
 
     } catch (error) {

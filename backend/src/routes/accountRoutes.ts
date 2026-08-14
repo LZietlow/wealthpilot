@@ -9,8 +9,8 @@ import { authenticateToken } from "../middleware/authMiddleware";
 
 
 router.get('/', authenticateToken, async(req, res) => {
-    console.log('req.userId in Route:', (req as any).userId);
-    console.log('body:', req.body)
+    //console.log('req.userId in Route:', (req as any).userId);
+    //console.log('body:', req.body)
     var userId = (req as any).userId;
 
     if(userId != undefined) {
