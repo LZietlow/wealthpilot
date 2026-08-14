@@ -52,4 +52,50 @@ router.post('/', authenticateToken, async(req, res) => {
 
 })
 
+
+router.delete('/:id', authenticateToken, async(req,res) => {
+    const transaction_id = req.params.id;
+    const userId = (req as any).userId;
+    try {
+        const result = await pool.query('SELECT * FROM transactions JOIN accounts ON transactions.account_id = accounts.id WHERE transactions.id = $1 AND user_id = $2', [transaction_id, userId]);
+        if(result.rows.length === 0) {
+            res.status(404).json({message: 'No matching transaction found'});
+            return;
+        }
+        await pool.query('DELETE FROM transactions WHERE id = $1', [transaction_id]);
+        res.status(200).json({message: 'Transaction succesfully deleted'});
+    } catch (error) {
+        res.status(500).json({message: 'Could not delete transaction'});
+    }
+})
+
+router.patch('/:id', authenticateToken, async(req,res) => {
+    const transaction_id = req.params.id;
+    const userId = (req as any).userId;
+
+    var transaction;
+    try {
+        transaction = await pool.query('SELECT * FROM transactions JOIN accounts ON transactions.account_id = accounts.id WHERE transactions.id = $1 AND user_id = $2', [transaction_id, userId]);
+        if(transaction.rows.length === 0) {
+            res.status(404).json({message: 'No matching transaction found'});
+            return;
+        }
+    } catch (error) {
+        res.status(400).json({message: 'Could not find transaction'});
+        return;
+    }
+
+    const newAmount = req.body.amount !== undefined ? req.body.amount : transaction.rows[0].amount;
+    const newDescription = req.body.description !== undefined ? req.body.description : transaction.rows[0].description;
+    const newCategory = req.body.category_id !== undefined ? req.body.category_id : transaction.rows[0].category_id;
+    const account_id = transaction.rows[0].account_id
+    try {
+        const updatedTransaction = await pool.query('UPDATE transactions SET amount = $1, description = $2, category_id = $3 WHERE account_id = $4 AND id = $5 RETURNING *', [newAmount, newDescription, newCategory, account_id, transaction_id]);
+        res.status(200).json({message: 'transaction succesfully updated', transaction: updatedTransaction.rows[0]});
+    } catch (error) {
+        res.status(500).json({message: 'could not update transaction'});
+    }
+
+})
+
 export default router;

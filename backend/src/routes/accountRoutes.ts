@@ -41,4 +41,46 @@ router.post('/', authenticateToken, async(req, res) => {
 
 })
 
+router.delete('/:id', authenticateToken, async(req, res) => {
+    const accountId = req.params.id;
+    const userId = (req as any).userId;
+
+    try {
+        const result = await pool.query('DELETE FROM accounts WHERE id = $1 AND user_id = $2 RETURNING *', [accountId, userId]);
+        if(result.rows.length === 0) {;
+            res.status(404).json({message: 'No matching account found'})
+            return;
+        }
+        res.status(200).json({message: 'Account deleted succesfully'});
+    } catch (error) {
+        res.status(500).json({message: 'Could not delete account'});
+    }
+})
+
+router.patch('/:id', authenticateToken, async(req, res) => {
+    const accountId = req.params.id;
+    const userId = (req as any).userId;
+    var account;
+    try {
+        account = await pool.query('SELECT * FROM accounts WHERE id = $1 AND user_id = $2', [accountId, userId]);
+        if(account.rows.length === 0) {
+            res.status(404).json({message: 'No matching account found'})
+            return;
+        }
+    } catch (error) {
+        res.status(400).json({message: 'Could not find account'})
+        return;
+    }
+    const newName = req.body.name || account.rows[0].name;
+    const newBalance = req.body.balance !== undefined ? req.body.balance : account.rows[0].balance;
+
+    try {
+        const updatedAccount = await pool.query('UPDATE accounts SET name = $1, balance = $2 WHERE id = $3 AND user_id = $4 RETURNING *', [newName, newBalance, accountId, userId]);
+        res.status(200).json({message: 'account succesfully updated', account: updatedAccount.rows[0]});
+    } catch (error) {
+        res.status(500).json({message: 'could not update account'});
+    }
+
+})
+
 export default router;
