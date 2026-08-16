@@ -117,4 +117,15 @@ router.post('/suggest-category', authenticateToken, async(req, res) => {
 
 })
 
+router.get('/monthly-summary', authenticateToken, async(req, res) => {
+    const user_id = (req as any).userId;
+
+    try {
+        const response = await pool.query(`SELECT DATE_TRUNC('month', transaction_date) AS month,SUM(amount) AS total FROM transactions JOIN accounts ON transactions.account_id = accounts.id WHERE accounts.user_id = $1 GROUP BY DATE_TRUNC('month', transaction_date) ORDER BY month ASC`, [user_id]);    
+        res.status(200).json({monthlySummary: response.rows});
+    } catch (error) {
+        res.status(500).json({monthlySummary: null});
+    }
+})
+
 export default router;
