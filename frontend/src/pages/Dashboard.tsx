@@ -104,6 +104,13 @@ export default function Dashboard() {
         return arr;
     }
 
+    async function handleDescriptionBlur(e: React.FocusEvent<HTMLInputElement>) {
+        const token = localStorage.getItem('token');
+        const response = await axios.post('http://localhost:3000/transactions/suggest-category', { description: transDescription }, {headers: {Authorization: `Bearer ${token}`}});
+        const category_id = response.data.category_id;
+        setTransCategoryId(category_id || '');
+    }
+
     const totalByCategory = aggregateByCategory(transactions);
 
     return(
@@ -162,7 +169,8 @@ export default function Dashboard() {
                     placeholder="Transfer amount"></input>
                     <input name="description" value={transDescription} onChange={(e) => setTransDescription(e.target.value)}
                     className="w-full rounded-lg bg-zinc-700 border border-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    placeholder="description"></input>
+                    placeholder="description"
+                    onBlur={handleDescriptionBlur}></input>
                     <select value={transCategoryId} onChange={(e) => setTransCategoryId(e.target.value)}
                         className="w-full rounded-lg bg-zinc-700 border border-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                         <option value={""}>-- Kategorie wählen --</option>

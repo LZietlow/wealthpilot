@@ -2,6 +2,7 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/authMiddleware';
 import {pool} from '../config/db'
+import suggestCategory from '../utils/categorize';
 
 const router = express.Router();
 
@@ -94,6 +95,24 @@ router.patch('/:id', authenticateToken, async(req,res) => {
         res.status(200).json({message: 'transaction succesfully updated', transaction: updatedTransaction.rows[0]});
     } catch (error) {
         res.status(500).json({message: 'could not update transaction'});
+    }
+
+})
+
+router.post('/suggest-category', authenticateToken, async(req, res) => {
+    const description = req.body.description;
+    const category = suggestCategory(description);
+
+    if(category === null) {
+        res.status(200).json({category_id: null});
+        return;
+    }
+
+    try {
+        const category_id = await pool.query('SELECT id FROM categories WHERE name = $1', [category]);
+        res.status(200).json({category_id: category_id.rows[0].id});
+    } catch (error) {
+        res.status(500).json({category_id: null});
     }
 
 })
