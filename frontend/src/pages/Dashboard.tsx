@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 
 
@@ -107,55 +107,91 @@ export default function Dashboard() {
     const totalByCategory = aggregateByCategory(transactions);
 
     return(
-        <div>
-        <form onSubmit={handleCreateAccount}>
-            <input name="name" value={name} onChange={(e)=> setName(e.target.value)}></input>
-            <input name="balance" value={balance} onChange={(e)=> setBalance(e.target.value)}></input>
-            <button type="submit">Create new Account</button>
-            {error && <p>{error}</p>}
-        </form>
+        <div className="bg-zinc-900 min-h-screen p-8 text-zinc-100">
+            <header className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-bold">Dashboard</h2>
+                <button type="button" onClick={handleLogout} className="rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-700 outline-none focus-visible:ring-2 focus-visible:ring-zinc-700">Logout</button>
+            </header>
 
-        <ul>
-            {accounts.map(account => (
-                <li key={account.id}>
-                    {account.id} {account.name} {account.balance}
-                </li>
-            ))}
-        </ul>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-zinc-800 rounded-xl p-6">
+                    <form onSubmit={handleCreateAccount} className="flex flex-col gap-4">
+                    <input name="name" value={name} onChange={(e)=> setName(e.target.value)}
+                    className="w-full rounded-lg bg-zinc-700 border border-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    placeholder="Account name"></input>
+                    <input name="balance" value={balance} onChange={(e)=> setBalance(e.target.value)}
+                    className="w-full rounded-lg bg-zinc-700 border border-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    placeholder="Account balance"></input>
+                    <button type="submit"
+                    className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                    >Create new Account</button>
+                    {error && <p>{error}</p>}
+                </form>
+                <ul className="divide-y divide-zinc-700">
+                    {accounts.map(account => (
+                    <li key={account.id} className="py-2 flex justify-between">
+                        
+                        <span>{account.name} </span>
+                        <span>{account.balance} </span>
+                    </li>
+                    ))}
+                </ul>
+                </div>
 
-        <form onSubmit={handleCreateTransaction}>
-            <input name="account_id" value={transAccountId} onChange={(e) => setTransAccountId(e.target.value)}></input>
-            <input name="amount" value={transAmount} onChange={(e) => setTransAmount(e.target.value)}></input>
-            <input name="description" value={transDescription} onChange={(e) => setTransDescription(e.target.value)}></input>
-            <select value={transCategoryId} onChange={(e) => setTransCategoryId(e.target.value)}>
-                <option value={""}>-- Kategorie wählen --</option>
-                {categories.map(category => (
-                    <option key={category.id} value={category.id}>{category.name}</option>
-                ))}
-            </select>
-            <button type="submit">Do Transaction</button>
-        </form>
+                <div className="bg-zinc-800 rounded-xl p-6">
+                    <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={totalByCategory}>
+                        <XAxis dataKey='category'></XAxis>
+                        <YAxis></YAxis>
+                        <Tooltip></Tooltip>
+                        <Bar dataKey='total' fill="#8884d8"></Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+                
+            </div>
 
-        <ul>
-            {transactions.map(transaction => (
-                <li key={transaction.id}>
-                    {transaction.id} {transaction.category_name}
-                </li>
-            ))}
-        </ul>
+            <div className="bg-zinc-800 rounded-xl p-6 mb-6">
+                <form onSubmit={handleCreateTransaction} className="flex flex-col gap-4">
+                    <input name="account_id" value={transAccountId} onChange={(e) => setTransAccountId(e.target.value)}
+                    className="w-full rounded-lg bg-zinc-700 border border-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    placeholder="To Account"></input>
+                    <input name="amount" value={transAmount} onChange={(e) => setTransAmount(e.target.value)}
+                    className="w-full rounded-lg bg-zinc-700 border border-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    placeholder="Transfer amount"></input>
+                    <input name="description" value={transDescription} onChange={(e) => setTransDescription(e.target.value)}
+                    className="w-full rounded-lg bg-zinc-700 border border-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    placeholder="description"></input>
+                    <select value={transCategoryId} onChange={(e) => setTransCategoryId(e.target.value)}
+                        className="w-full rounded-lg bg-zinc-700 border border-zinc-800 px-4 py-2.5 text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        <option value={""}>-- Kategorie wählen --</option>
+                        {categories.map(category => (
+                            <option key={category.id} value={category.id}>{category.name}</option>
+                        ))}
+                    </select>
+                <button type="submit"
+                className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                >Do Transaction</button>
+                </form>
+            </div>
 
-        <button type="button" onClick={handleLogout}>Logout</button>
-
-        <BarChart width={600} height={300} data={totalByCategory}>
-            <XAxis dataKey='category'></XAxis>
-            <YAxis></YAxis>
-            <Tooltip></Tooltip>
-            <Bar dataKey='total' fill="#8884d8"></Bar>
-        </BarChart>
-        
-
-
-
+            <div className="bg-zinc-800 rounded-xl p-6">
+                <ul className="divide-y divide-zinc-700">
+                    {transactions.map(transaction => (
+                        <li key={transaction.id} className="py-2 flex justify-between">
+                            <div>
+                                <span className="text-zinc-400 text-sm">{transaction.category_name}</span>
+                                <span className="ml-2">{transaction.description}</span>
+                            </div>
+                            <div>
+                                <span>{transaction.amount}</span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+     
         </div>
     )
 
