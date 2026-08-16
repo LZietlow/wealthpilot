@@ -17,6 +17,7 @@ export default function Dashboard() {
     const[transDescription, setTransDescription] = useState('');
     const[categories, setCategories] = useState([]);
     const[transCategoryId, setTransCategoryId] =useState('');
+    const[forecast, setForecast] = useState<number | null>(null);
     const navigate = useNavigate();
 
 
@@ -32,6 +33,12 @@ export default function Dashboard() {
         setCategories(response.data.categories)
     }
 
+    async function fetchForecast() {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:3000/transactions/monthly-summary', { headers: { Authorization: `Bearer ${token}`}});
+        setForecast(response.data.forecast);
+    }
+
 
     async function fetchAccounts() {
             const token = localStorage.getItem('token');
@@ -43,6 +50,7 @@ export default function Dashboard() {
         fetchAccounts();
         fetchTransactions();
         fetchCategories();
+        fetchForecast();
     }, []);
 
     async function handleCreateAccount(e: React.FormEvent<HTMLFormElement>) {
@@ -155,6 +163,9 @@ export default function Dashboard() {
                         <Bar dataKey='total' fill="#8884d8"></Bar>
                         </BarChart>
                     </ResponsiveContainer>
+                    <div>
+                        {forecast !== null && (<p className="text-zinc-400">Forecast for next month: {forecast.toFixed(2)}</p>)}
+                    </div>
                 </div>
                 
             </div>
