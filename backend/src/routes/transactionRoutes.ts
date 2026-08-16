@@ -122,7 +122,18 @@ router.get('/monthly-summary', authenticateToken, async(req, res) => {
 
     try {
         const response = await pool.query(`SELECT DATE_TRUNC('month', transaction_date) AS month,SUM(amount) AS total FROM transactions JOIN accounts ON transactions.account_id = accounts.id WHERE accounts.user_id = $1 GROUP BY DATE_TRUNC('month', transaction_date) ORDER BY month ASC`, [user_id]);    
-        res.status(200).json({monthlySummary: response.rows});
+        if(!(response.rows.length === 0)) {
+            const months = response.rows.length;
+            const sum = response.rows.reduce((acc, row) => {
+                return acc + parseFloat(row.total);
+            }, 0);
+            const forecast = sum / months;
+            res.status(200).json({monthlySummary: response.rows, forecast: forecast});
+
+        } else {
+            res.status(200).json({monthlySummary: response.rows});
+        }
+        
     } catch (error) {
         res.status(500).json({monthlySummary: null});
     }
